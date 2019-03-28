@@ -3,17 +3,18 @@
 
 import time
 
-import jwt
+from jwt import JWT, jwk_from_pem, jwk_from_dict
 import requests
 
 
 class JWTAuth(requests.auth.AuthBase):
     def __init__(self, iss, key, expiration=10 * 60):
         self.iss = iss
-        self.key = key
         self.expiration = expiration
+        self.key = jwk_from_pem(bytes(key, 'utf-8'))
 
     def generate_token(self):
+        jwt = JWT()
         # Generate the JWT
         payload = {
           # issued at time
@@ -24,9 +25,9 @@ class JWTAuth(requests.auth.AuthBase):
           'iss': self.iss
         }
 
-        tok = jwt.encode(payload, self.key, algorithm='RS256')
+        token = jwt.encode(payload, self.key, 'RS256')
 
-        return tok.decode('utf-8')
+        return token
 
     def __call__(self, r):
         r.headers['Authorization'] = 'bearer {}'.format(self.generate_token())

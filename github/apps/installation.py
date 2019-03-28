@@ -21,3 +21,7 @@ class GitHubAppInstallation(request.GitHubRequest):
 
     def get_repositories(self):
         return self._get('installation/repositories')
+
+    def get_repository_url(self, repository):
+        return "https://x-access-token:%s@github.com/%s.git" % (self._access_token['token'], repository)
+
